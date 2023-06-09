@@ -72,23 +72,40 @@ let kitchen = new Room("kitchen",
 false,
 'You find a note on the fridge that says "The computer password is zork." Hope you can remember that!')
 
-let commands = ["change", "enter", "open", "go", "take", "pick", "drop", "put", "lie", "lay", "get"]
+let commands = {
+    move: ["move", "change", "enter", "open", "go"],
+    take:["take", "pick", "get"],
+    drop:["drop", "put", "lie", "lay", "leave"]
+}
 
-let nouns = ["fruit", "paper", "newspaper", "magazine", "note", "sign", "foyer", "office", "bedroom", "living room", "kitchen"]
+let nouns = {
+  rooms: ["foyer", "office", "bedroom", "living room", "kitchen"],
+  item: ["fruit", "paper", "newspaper", "magazine", "note", "sign"],
+};
 
 function genericSentence(userInput){
   let newAnswer = []
   let answerArray = userInput.split(" ")
   answerArray.forEach(word => {
-    commands.includes(word) ? newAnswer.push(word) : null
-    nouns.includes(word) ? newAnswer.push(word) : null
-  }
-    )
-  let sentence = newAnswer.join(" ")
-  return sentence
+    if (commands.move.includes(word)){
+      newAnswer.push("move")
+    } else if (commands.take.includes(word)){
+      newAnswer.push("take")
+    } else if (commands.drop.includes(word))
+      newAnswer.push("drop")
+  })
+    answerArray.forEach((word) => {
+      if (nouns.rooms.includes(word)) {
+        newAnswer.push(word);
+      } else if (nouns.item.includes(word)) {
+        newAnswer.push(word);
+      } ;
+    });
+
+return newAnswer
 }
 
-console.log(genericSentence("drop the newspaper"))
+console.log(genericSentence("enter the foyer"))
 
 //state machine to establish room movement (room state, current room variable, function to move rooms)
 let roomState = {
@@ -122,11 +139,14 @@ let playerInventory = [];
 
 function addInventory(item) {
   playerInventory.push(item);
+  console.log(`You have added ${item} to your inventory`)
   // ! add code to remove item from room
 }
 
 function removeInventory(item) {
-  playerInventory = playerInventory.filter(i => i !== item)
+  playerInventory.includes(item)
+    ? playerInventory = playerInventory.filter(i => i !== item)
+    : console.log(`You do not have ${item} in your inventory`)
   // !add code here to put item back in room inventory
 }
 
@@ -146,27 +166,15 @@ async function start() {
 
   let answer = await ask(welcomeMessage);
   answer = genericSentence(answer)
+  console.log(answer)
   
-  while (answer !== "exit") {
-    if (answer.toLowerCase() == "hint") {
-      console.log(hints);
-    } else if (answer == "read sign") {
-      startingRoom.readSign();
-    } else if (answer == "12345" && foyer.isLocked){
-      console.log("You unlocked the door")
-      foyer.isLocked = false
-    } else if (answer == "12345" && !foyer.isLocked){
-      console.log("You already unlocked the door")
-    } else if (answer == "take sign" || answer == "grab sign"){
-      console.log("Don't take the sign. That's not nice")
-    } else if (answer == "enter foyer" && !foyer.isLocked){
-      answer = answer.slice(6)
-      changeRooms(answer)
-      foyer.readSign()
-    } else if (answer == "enter foyer" && foyer.isLocked) {
-      console.log("You need to unlock the door, first")
-    } else {
-      console.log(`I don't know how to ${answer}`);
+  while (currentRoom !== "bedroom") {
+    if(answer[0] == "move"){
+      changeRooms(answer[1])
+    } else if (answer[0] == "take"){
+      addInventory(answer[1])
+    } else if (answer[0] == "drop"){
+      removeInventory(answer[1])
     }
 
     answer = await ask(">_ ");
