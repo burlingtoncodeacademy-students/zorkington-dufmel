@@ -72,6 +72,8 @@ let kitchen = new Room("kitchen",
 false,
 'You find a note on the fridge that says "The computer password is zork." Hope you can remember that!')
 
+//Array of possible user inputs
+
 let commands = {
     move: ["move", "change", "enter", "open", "go"],
     take:["take", "pick", "get"],
@@ -79,9 +81,11 @@ let commands = {
 }
 
 let nouns = {
-  rooms: ["foyer", "office", "bedroom", "living room", "kitchen"],
+  rooms: [foyer, office, bedroom, livingRoom, kitchen],
   item: ["fruit", "paper", "newspaper", "magazine", "note", "sign"],
 };
+
+//checks user inputs against above arrays to create generic phrases used in later logic
 
 function genericSentence(userInput){
   let newAnswer = []
@@ -105,7 +109,7 @@ function genericSentence(userInput){
 return newAnswer
 }
 
-console.log(genericSentence("enter the foyer"))
+
 
 //state machine to establish room movement (room state, current room variable, function to move rooms)
 let roomState = {
@@ -186,3 +190,4 @@ async function start() {
     
   process.exit();
 }
+
