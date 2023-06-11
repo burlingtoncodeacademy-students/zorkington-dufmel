@@ -29,7 +29,8 @@ class Room {
   readSign() {console.log(this.sign)}
 }
 
-let startingRoom = new Room(
+
+let porch = new Room(
   "porch",
   "123 Main St.",
   [],
@@ -81,9 +82,24 @@ let commands = {
 }
 
 let nouns = {
-  rooms: [foyer, office, bedroom, livingRoom, kitchen],
+  room: ["foyer", "office", "bedroom", "living room", "kitchen", "porch"],
   item: ["fruit", "paper", "newspaper", "magazine", "note", "sign"],
 };
+
+let currentRoom = porch; //this will update as player moves throughout the game
+let newRoom
+
+//put room objects into an interable array
+
+let roomArray = [
+  porch,
+  foyer,
+  office,
+  bedroom,
+  livingRoom,
+  kitchen,
+];
+
 
 //checks user inputs against above arrays to create generic phrases used in later logic
 
@@ -99,10 +115,15 @@ function genericSentence(userInput){
       newAnswer.push("drop")
   })
     answerArray.forEach((word) => {
-      if (nouns.rooms.includes(word)) {
+      if (nouns.item.includes(word)) {
         newAnswer.push(word);
-      } else if (nouns.item.includes(word)) {
-        newAnswer.push(word);
+      } else if (nouns.room.includes(word)) {
+        roomArray.forEach(object =>{ //finds the object based on user string inpu
+          //the object will be set as new room for change room function
+          for(word in object){
+            return newRoom = object
+          }
+        })
       } ;
     });
 
@@ -110,32 +131,36 @@ return newAnswer
 }
 
 
-
 //state machine to establish room movement (room state, current room variable, function to move rooms)
 let roomState = {
-  startingRoom: ["foyer"],
-  foyer: ["startingRoom", "office", "livingRoom"],
-  office: ["foyer", "bedroom"],
-  bedroom: ["foyer"],
-  livingRoom: ["foyer", "kitchen"],
-  kitchen: ["livingRoom"]
+  porch: [foyer],
+  foyer: [porch, office, livingRoom],
+  office: [foyer, bedroom],
+  bedroom: [foyer],
+  livingRoom: [foyer, kitchen],
+  kitchen: [livingRoom]
 };
 
-let currentRoom = "startingRoom"; //this will update as player moves throughout the game
+// function changeRooms(newRoom) {
+//   console.log(newRoom)
+//   // let validTransition = roomState[currentRoom];
+//   // console.log(validTransition);
+//   if (newRoom in roomState[currentRoom]) {
+//     currentRoom = newRoom;
+//     currentRoom[sign()];
+//   } else {
+//     console.log(`You cannot get to the ${newRoom} from the ${currentRoom}`);
+//   }
+// }
 
-
-function changeRooms(newRoom) {
-  console.log(newRoom)
-  let validTransition = roomState[currentRoom];
-  console.log(validTransition);
-  if (validTransition.includes(newRoom)) {
-    currentRoom = newRoom;
-    console.log(`You have entered the ${currentRoom}`);
-  } else {
-    console.log(`You cannot get to the ${newRoom} from the ${currentRoom}`);
+function changeRooms(newRoom){
+  for (let connectedRooms of Object.entries(roomState)){
+    if (connectedRooms.includes(newRoom)){
+      currentRoom = newRoom
+      return currentRoom
+    }else (console.log(`You cannot get to the ${JSON.stringify(newRoom.name)} from the ${JSON.stringify(currentRoom.name)}`))
   }
 }
-
 
 //player inventory will change as functions are called to move items
 
@@ -174,7 +199,7 @@ async function start() {
   
   while (currentRoom !== "bedroom") {
     if(answer[0] == "move"){
-      changeRooms(answer[1])
+      changeRooms(newRoom)
     } else if (answer[0] == "take"){
       addInventory(answer[1])
     } else if (answer[0] == "drop"){
