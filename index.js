@@ -39,21 +39,22 @@ let porch = new Room(
   [],
   false,
   `The sign says "Welcome to Burlington Code Academy!
-  Come on up to the third floor.
+  Come on up to the foyer.
   If the door is locked, use the code 12345.`
 );
 
 let foyer = new Room(
   "foyer",
   "You are in a foyer.\nOr maybe it's an antechamber.\nOr a vestibule.\nOr an entryway.\nOr an atrium.\nOr a narthex. \nBut let's forget all that fancy flatlander vocabulary, and just call it a foyer.\nIn Vermont, this is pronounced 'FO-ee-yurr.' Anyways, it's definitely not a mudroom.\nA copy of Seven Days lies in a corner. There are two doors.\nOne goes into the office. The other goes into the den.",
-  ["paper"],
+  ["paper", "newspaper", "magazine"],
   true,
-  "");
+  ""
+);
 
 let office = new Room (
   "office",
   "The office is a bit musty. It looks like you can get to the bedroom from here.\nThere is a computer on the desk. It is asking for a password.", 
-  ['notepad'],
+  ['computer'],
   false,
   'When you enter the computer password, you get a pop-up message that says,\n"The bedroom password is 135."')
 
@@ -66,11 +67,13 @@ let bedroom = new Room(
   135
 );
 
-let den = new Room("den",
-"There is a roaring fire, a comfy sofa, and a giant deer head over the mantle.\nNext to the fireplace there is a recyling basket filled with newspaper like you found in the foyer.\nThere is a door to the kitchen.",
-[],
-false,
-"");
+let den = new Room(
+  "den",
+  "There is a roaring fire, a comfy sofa, and a giant deer head over the mantle.\nNext to the fireplace there is a recyling basket filled with newspaper like you found in the foyer.\nThere is a door to the kitchen.",
+  ["deer head", "paper", "newspaper", "magazine"],
+  false,
+  ""
+);
 
 let kitchen = new Room("kitchen",
 "Now this is a kitchen. Take a look at that pile of fruit on the counter\n You also notice a sign on the refrigerator",
@@ -89,8 +92,10 @@ let commands = {
 
 let nouns = {
   rooms: ["foyer", "office", "bedroom", "den", "kitchen", "porch"],
-  item: ["fruit", "paper", "newspaper", "magazine", "note", "sign", "zork"],
-  password: ["12345", "135", "zork"]
+  item: ["fruit", "paper", "newspaper", "magazine", "zork"],
+  password: ["12345", "135", "zork"],
+  itemStaysInRoom: ["computer", "sign", "deer head" ],
+  inventory: ["i", "inventory", "items"]
 };
 
 //checks user inputs against above arrays to create generic phrases used in later logic
@@ -107,16 +112,20 @@ function genericSentence(userInput) {
       answerObject.verb = "move"
     } else if (commands.read.includes(word)){
       answerObject.verb = "read"
-    }
-    else if (commands.take.includes(word)){
+    } else if (commands.take.includes(word)){
       answerObject.verb = "take"
     } else if (commands.drop.includes(word))
       answerObject.verb = "drop"
   })
 
   answerArray.forEach((word) => {
-    if (nouns.rooms.includes(word) || nouns.item.includes(word) || nouns.password.includes(word)) {
+    if (nouns.rooms.includes(word)
+    || nouns.item.includes(word)
+    || nouns.password.includes(word)
+    || nouns.itemStaysInRoom.includes(word)) {
       answerObject.noun = word;
+    } else if(nouns.inventory.includes(word)){
+      answerObject.noun = "inventory"
     }
   });
 
@@ -175,17 +184,26 @@ function unlockDoor (password) {
 let playerInventory = [];
 
 function addInventory(item) {
-  
+  if (!roomObject.inventory.includes(item)){
+    console.log(`There is no ${item} this room.`)
+  } else if(nouns.itemStaysInRoom.includes(answer.noun)){
+    console.log(`You can take the ${item} from here. That would be rude!`)
+  } else {
   playerInventory.push(item);
-  console.log(`You have added ${item} to your inventory`)
-  // ! add code to remove item from room
+  console.log(`You have added ${item} to your inventory`)}
+  
 }
 
 function removeInventory(item) {
-  playerInventory.includes(item)
-    ? playerInventory = playerInventory.filter(i => i !== item)
-    : console.log(`You do not have ${item} in your inventory`)
-  // !add code here to put item back in room inventory
+  if(playerInventory.includes(item)){
+    playerInventory = playerInventory.filter(i => i !== item)
+    roomObject.inventory.push(item)
+  } else { console.log(`You do not have a ${item} in your inventory`)
+}  
+}
+
+function checkInventory() {
+  console.log(`Your inventory incldes ${playerInventory.toString()}`)
 }
 
 // let hints = "Try one of these commands: enter, read, take, drop, inventory"
@@ -205,7 +223,7 @@ async function start() {
   answer = genericSentence(answer)
     
   while (currentRoom !== "bedroom") {
-    if(answer.noun && !answer.verb){
+    if(nouns.password.includes(answer.noun)){
       unlockDoor(answer.noun)
     }  
     else if (answer.verb === "move"){
@@ -216,6 +234,8 @@ async function start() {
       removeInventory(answer.noun)
     } else if (answer.verb === "read"){
       roomObject.readSign()
+    } else if (answer.noun === "inventory"){
+      checkInventory()
     } else {`Sorry, I don't know how to do that`}
 
     
@@ -223,7 +243,9 @@ async function start() {
     answer = genericSentence(answer)
   }
   
-  answer = await ask ("To exit the game, type exit")
+  answer = await ask(
+    "Congratulations! You win! Enjoy your nap! To exit the game, type exit"
+  );
      
   process.exit();
 }
