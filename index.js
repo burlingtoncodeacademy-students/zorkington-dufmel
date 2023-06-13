@@ -95,7 +95,7 @@ let nouns = {
   item: ["fruit", "paper", "newspaper", "magazine", "zork"],
   password: ["12345", "135", "zork"],
   itemStaysInRoom: ["computer", "sign", "deer head" ],
-  inventory: ["i", "inventory", "items"]
+  inventory: ["inventory", "items"]
 };
 
 //checks user inputs against above arrays to create generic phrases used in later logic
@@ -114,9 +114,9 @@ function genericSentence(userInput) {
       answerObject.verb = "read"
     } else if (commands.take.includes(word)){
       answerObject.verb = "take"
-    } else if (commands.drop.includes(word))
+    } else if (commands.drop.includes(word)){
       answerObject.verb = "drop"
-  })
+    } else {return null}})
 
   answerArray.forEach((word) => {
     if (nouns.rooms.includes(word)
@@ -126,7 +126,7 @@ function genericSentence(userInput) {
       answerObject.noun = word;
     } else if(nouns.inventory.includes(word)){
       answerObject.noun = "inventory"
-    }
+    } else {return null}
   });
 
   return answerObject
@@ -184,14 +184,14 @@ function unlockDoor (password) {
 let playerInventory = [];
 
 function addInventory(item) {
-  if (!roomObject.inventory.includes(item)){
-    console.log(`There is no ${item} this room.`)
-  } else if(nouns.itemStaysInRoom.includes(answer.noun)){
+  if (roomObject.inventory.includes(item)){
+    playerInventory.push(item);
+    console.log(`You have added ${item} to your inventory`)
+  } else if(nouns.itemStaysInRoom.includes(item)){
     console.log(`You can take the ${item} from here. That would be rude!`)
   } else {
-  playerInventory.push(item);
-  console.log(`You have added ${item} to your inventory`)}
-  
+    console.log(`There isn't one you can have.`)
+  }  
 }
 
 function removeInventory(item) {
@@ -225,10 +225,9 @@ async function start() {
   while (currentRoom !== "bedroom") {
     if(nouns.password.includes(answer.noun)){
       unlockDoor(answer.noun)
-    }  
-    else if (answer.verb === "move"){
+    } else if (answer.verb === "move"){
       changeRooms(answer.noun)
-    } else if (answer.verb == "take"){
+    } else if (answer.verb === "take"){
       addInventory(answer.noun)
     } else if (answer.verb == "drop"){
       removeInventory(answer.noun)
@@ -236,7 +235,8 @@ async function start() {
       roomObject.readSign()
     } else if (answer.noun === "inventory"){
       checkInventory()
-    } else {`Sorry, I don't know how to do that`}
+    } else {
+      console.log(`Sorry, I don't know how to do that`)}
 
     
     answer = await ask(">_ ");
@@ -244,7 +244,7 @@ async function start() {
   }
   
   answer = await ask(
-    "Congratulations! You win! Enjoy your nap! To exit the game, type exit"
+    "Congratulations! You win! Enjoy your nap! To exit the game, type exit\n>_"
   );
      
   process.exit();
