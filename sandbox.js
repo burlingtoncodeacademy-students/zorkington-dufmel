@@ -23,7 +23,8 @@ const WildBillsMagic = {
     "The office is a bit musty. It looks like you can get to the bedroom from here.\nThere is a computer on the desk. It is asking for a password.",
     ["notepad"],
     false,
-    'When you enter the computer password, you get a pop-up message that says,\n"The bedroom password is 135."'
+    'When you enter the computer password, you get a pop-up message that says,\n"The bedroom password is 135."',
+    ""
   ),
 
   bedroom: new Room(

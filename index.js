@@ -186,6 +186,8 @@ let playerInventory = [];
 function addInventory(item) {
   if (roomObject.inventory.includes(item)){
     playerInventory.push(item);
+    let index = roomObject.inventory.indexOf(item)
+    roomObject.inventory.splice(index, 1)
     console.log(`You have added ${item} to your inventory`)
   } else if(nouns.itemStaysInRoom.includes(item)){
     console.log(`You can take the ${item} from here. That would be rude!`)
@@ -196,14 +198,18 @@ function addInventory(item) {
 
 function removeInventory(item) {
   if(playerInventory.includes(item)){
-    playerInventory = playerInventory.filter(i => i !== item)
+    let index = playerInventory.indexOf(item)
+    playerInventory.splice(index, 1)
     roomObject.inventory.push(item)
+    console.log(`You put down the ${item}`)
   } else { console.log(`You do not have a ${item} in your inventory`)
 }  
 }
 
 function checkInventory() {
-  console.log(`Your inventory incldes ${playerInventory.toString()}`)
+  playerInventory.length === 0
+  ?console.log("You do not have anything in your inventory")
+  : console.log(`Your inventory incldes ${playerInventory.toString()}`)
 }
 
 // let hints = "Try one of these commands: enter, read, take, drop, inventory"
@@ -239,7 +245,7 @@ async function start() {
       console.log(`Sorry, I don't know how to do that`)}
 
     
-    answer = await ask(">_ ");
+    answer = await ask(`Curent location: ${currentRoom} >_ `);
     answer = genericSentence(answer)
   }
   
