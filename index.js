@@ -17,6 +17,22 @@ function ask(questionText) {
   });
 }
 
+function lineBreak(text){
+  let words = text.split(" ")
+  let lines = []
+  let currentLine = ""
+
+  words.forEach(word =>{
+    if(currentLine.length + word.length <=80){
+      currentLine += word + " "
+    }else{
+      lines.push(currentLine.trim())
+      currentLine = word + " "
+    }
+  })
+  return lines.join("\n")
+}
+
 // room contructor to create each new room
 class Room {
   constructor(name, description, invetory, isLocked, sign, password) {
@@ -28,9 +44,9 @@ class Room {
       this.password = password
   }
 
-  readSign () {console.log(this.sign)};
+  readSign () {console.log(lineBreak(this.sign))};
 
-  readDescription() {console.log(this.description)};
+  readDescription() {console.log(lineBreak(this.description))};
 }
 
 let porch = new Room(
@@ -45,7 +61,7 @@ let porch = new Room(
 
 let foyer = new Room(
   "foyer",
-  "You are in a foyer.\nOr maybe it's an antechamber.\nOr a vestibule.\nOr an entryway.\nOr an atrium.\nOr a narthex. \nBut let's forget all that fancy flatlander vocabulary, and just call it a foyer.\nIn Vermont, this is pronounced 'FO-ee-yurr.' Anyways, it's definitely not a mudroom.\nA copy of Seven Days lies in a corner. There are two doors.\nOne goes into the office. The other goes into the den.",
+  "You are in a foyer.Or maybe it's an antechamber.Or a vestibule.Or an entryway.Or an atrium.Or a narthex. But let's forget all that fancy flatlander vocabulary, and just call it a foyer.In Vermont, this is pronounced 'FO-ee-yurr.' Anyways, it's definitely not a mudroom.A copy of Seven Days lies in a corner. There are two doors.One goes into the office. The other goes into the den.",
   ["paper", "newspaper", "magazine"],
   true,
   ""
@@ -56,7 +72,7 @@ let office = new Room (
   "The office is a bit musty. It looks like you can get to the bedroom from here.\nThere is a computer on the desk. It is asking for a password.", 
   ['computer'],
   false,
-  'When you enter the computer password, you get a pop-up message that says,\n"The bedroom password is 135."')
+  'When you enter the computer password, you get a pop-up message that says, "The bedroom password is 135."')
 
 let bedroom = new Room(
   "bedroom",
@@ -69,7 +85,7 @@ let bedroom = new Room(
 
 let den = new Room(
   "den",
-  "There is a roaring fire, a comfy sofa, and a giant deer head over the mantle.\nNext to the fireplace there is a recyling basket filled with newspaper like you found in the foyer.\nThere is a door to the kitchen.",
+  "There is a roaring fire, a comfy sofa, and a giant deer head over the mantle. Next to the fireplace there is a recyling basket filled with newspaper like you found in the foyer. There is a door to the kitchen.",
   ["deer head", "paper", "newspaper", "magazine"],
   false,
   ""
@@ -206,13 +222,13 @@ function removeInventory(item) {
 }  
 }
 
+//Function for player to check inventory
 function checkInventory() {
   playerInventory.length === 0
   ?console.log("You do not have anything in your inventory")
   : console.log(`Your inventory incldes ${playerInventory.toString()}`)
 }
 
-// let hints = "Try one of these commands: enter, read, take, drop, inventory"
 
 //**********End of code-base for reusable items later in the game*******/
 
